@@ -4,7 +4,7 @@ const Database = require("st.db")
 const db = new Database({path:"bank"})
 const config = require("./config.json")
 const prefix = config.prefix;
-const token = process.env.token;
+const token = config.token;
 const activeRole = config.activeRole;
 const activeLog = config.activeLog;
 const bankAdminRole = config.bankAdminRole;
@@ -53,7 +53,7 @@ client.on("messageCreate",async wolf => {
         
       .setTitle("**Activation section - قسم التفعيل**")
         .setColor("#2f3136")
-       .setDescription("**مرحباً بكم يا اعضاء ولف امباير 🤗 .\nانتم الآن في محطة التفعيل ⚙ .\nيرجى الضغط على الزر اسفل الرساله والاجابة على كامل الاسئلة التي ستظهر لكم 👌 .\nملاحظة : الاجابة ستكون فقط بنعم او لا 😁 .**")
+       .setDescription("**مرحباً بكم يا اعضاء ويست 🤗 .\nانتم الآن في محطة التفعيل ⚙ .\nيرجى الضغط على الزر اسفل الرساله والاجابة على كامل الاسئلة التي ستظهر لكم 👌 .\nملاحظة : الاجابة ستكون فقط بنعم او لا 😁 .**")
         
  let button = new Discord.MessageButton()
 .setCustomId("active")
@@ -246,7 +246,7 @@ client.on('messageCreate',async wolf => {
         
       .setTitle("**Bank section - قسم البنك**")
         .setColor("#2f3136")
-       .setDescription("**مرحباً بكم يا اعضاء ولف امباير 🤗 .\nانتم الآن في محطة البنك 🏛 .\nيرجى الضغط على الزر اسفل الرساله لانشاء حسابك البنكي .\nيرجى الاحتفاظ برقم حسابك `الايبان` ورمز بطاقتك `cvc` 👌 .**")
+       .setDescription("**مرحباً بكم يا اعضاء ويست 🤗 .\nانتم الآن في محطة البنك 🏛 .\nيرجى الضغط على الزر اسفل الرساله لانشاء حسابك البنكي .\nيرجى الاحتفاظ برقم حسابك `الايبان` ورمز بطاقتك `cvc` 👌 .**")
         
  let button = new Discord.MessageButton()
 .setCustomId("bank_create")
@@ -274,6 +274,9 @@ client.on("interactionCreate",async interaction => {
         let bank = db.get({key:`bank_SA${user.id}`})
    //     let balance = db.get({key: `balance_SA${user.id}`})
     //    let cash = db.get({key:`cash_SA${user.id}`})
+        let blacklist = db.get({key:`blacklist_${user.id}`})
+
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
         
         if(bank){
             interaction.reply({content:`**🙄 - انت تمتلك بالفعل حساب بنكي .\nمعلومات حسابك :\nالإيبان : ${bank.iban}\nرمز حسابك :${bank.cvc}\nرصيد حسابك في البنك :${bank.balance}\nرصيدك في الكاش : ${bank.cash}**`,ephemeral:true})
@@ -302,6 +305,9 @@ daily: "available"
             let bank = db.get({key:`bank_SA${user.id}`})
             
             if(!bank) return interaction.reply({content:"**🙄 - انت لا تملك حساب بنكي .**",ephemeral:true})
+            
+            let blacklist = db.get({key:`blacklist_${user.id}`})
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
 
 
          
@@ -439,6 +445,9 @@ client.on('interactionCreate',async interaction => {
         let user = interaction.user;
         let bank = db .get({key: `bank_SA${user.id}`})
                       if(!bank) return interaction.reply({content:"**🙄 - انت لا تملك حساب بنكي .**",ephemeral:true})
+      let blacklist = db.get({key:`blacklist_${user.id}`})
+
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
         var st;
       if(bank.daily === "unavailable"){
         st = "تم استلام الراتب اليومي ."
@@ -464,6 +473,10 @@ client.on('interactionCreate',async interaction => {
                     let bank = db.get({key:`bank_SA${user.id}`})
                                   if(!bank) return interaction.reply({content:"**🙄 - انت لا تملك حساب بنكي .**",ephemeral:true})
       
+        let blacklist = db.get({key:`blacklist_${user.id}`})
+
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
+        
       const modal = new ModalBuilder()
 
 
@@ -506,7 +519,12 @@ client.on('interactionCreate',async interaction => {
                         let bank = db.get({key:`bank_SA${interaction.user.id}`})
             
                           if(!bank) return interaction.reply({content:"**🙄 - انت لا تملك حساب بنكي .**",ephemeral:true})
-           const modal = new ModalBuilder()
+   
+            let blacklist = db.get({key:`blacklist_${interaction.user.id}`})
+
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
+            
+            const modal = new ModalBuilder()
 
         .setCustomId('bank_modal2')
 
@@ -556,6 +574,10 @@ client.on('interactionCreate',async interaction => {
                   let bank = db.get({key:`bank_SA${user.id}`})
                                 if(!bank) return interaction.reply({content:"**🙄 - انت لا تملك حساب بنكي .**",ephemeral:true})
                 
+                let blacklist = db.get({key:`blacklist_${user.id}`})
+
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
+                
                 let daily = bank.daily
                 
                 if(daily === "available"){
@@ -598,6 +620,10 @@ client.on('interactionCreate',async interaction => {
                     let user = interaction.user;                    
                                 let bank = db.get({key:`bank_SA${user.id}`})
                                 if(!bank) return interaction.reply({content:"**🙄 - انت لا تملك حساب بنكي .**",ephemeral:true})
+                    
+                    let blacklist = db.get({key:`blacklist_${user.id}`})
+
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
 
            const modal = new ModalBuilder()
 
@@ -643,6 +669,10 @@ client.on('interactionCreate',async interaction => {
                     let user = interaction.user;                    
                                 let bank = db.get({key:`bank_SA${user.id}`})
                                 if(!bank) return interaction.reply({content:"**🙄 - انت لا تملك حساب بنكي .**",ephemeral:true})
+                        
+                        let blacklist = db.get({key:`blacklist_${user.id}`})
+
+         if(blacklist) return interaction.reply({content:`**⚠️ - انت موجود ضمن قائمة المحظورين ! .\nسبب الحظر : ${blacklist.res}\nمدة الحظر : \`${blacklist.time}\` يوم\nالمسؤول الذي قام بحظرك : <@!${blacklist.admin}> **`,ephemeral:true})
 
            const modal = new ModalBuilder()
 
@@ -743,7 +773,187 @@ client.on('interactionCreate',async interaction => {
                   )
                             await client.modal.open(interaction , modal);
                         
-                        }
+                        } else if(interaction.customId === "remove_money"){
+                        let user = interaction.user;
+                        const modal = new ModalBuilder()
+
+        .setCustomId('bank_modal6')
+
+        .setTitle('Bank Section - محطة البنك')
+
+              .addComponents(
+
+            new ModalField()
+
+        .setCustomId('a_id')
+
+        .setLabel("ايدي حساب الشخص")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط ايدي حساب الدسكورد الخاص بالشخص.")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  
+                  new ModalField()
+
+        .setCustomId('a_amount')
+
+        .setLabel("المبلغ المراد إضافته :")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط المبلغ المراد إزالته .")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  new ModalField()
+
+        .setCustomId('a_password')
+
+        .setLabel("كلمة سر البنك :")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط كلمة السر الخاصة بالمسؤولين .")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  )
+                            await client.modal.open(interaction , modal);    
+                            
+                            } else if(interaction.customId === "delete_money"){
+                                const modal = new ModalBuilder()
+
+        .setCustomId('bank_modal7')
+
+        .setTitle('Bank Section - محطة البنك')
+
+              .addComponents(
+
+            new ModalField()
+
+        .setCustomId('h_id')
+
+        .setLabel("ايدي حساب الشخص :")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط ايدي حساب الدسكورد الخاص بالشخص .")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  
+                  new ModalField()
+
+        .setCustomId('h_password')
+
+        .setLabel("كلمة سر البنك :")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط كلمة السر الخاصة بالمسؤولين .")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  )
+                                    await client.modal.open(interaction , modal);
+                 } else if(interaction.customId === "add_blacklist"){
+                     let user = interaction.user;
+                     const modal = new ModalBuilder()
+
+        .setCustomId('bank_modal8')
+
+        .setTitle('Bank Section - محطة البنك')
+
+              .addComponents(
+
+            new ModalField()
+
+        .setCustomId('black_id')
+
+        .setLabel("ايدي حساب الشخص :")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط ايدي حساب الدسكورد الخاص بالشخص .")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  
+                  new ModalField()
+
+        .setCustomId('black_reason')
+
+        .setLabel("سبب البلاك لبست :")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط سبب البلاك ليست .")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  
+                  new ModalField()
+
+        .setCustomId('black_duration')
+
+        .setLabel("مدة البلاك ليست :")
+
+              .setRequired(true)
+
+              .setPlaceholder(`ضع فقط مدة البلاك ليست "ضع فقط عدد الايام مثل 15 , 10 . . " .`)
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  
+                  new ModalField()
+
+        .setCustomId('black_password')
+
+        .setLabel("كلمة سر البنك :")
+
+              .setRequired(true)
+
+              .setPlaceholder("ضع فقط كلمة سر الخاصة بالمسؤولين .")
+
+              .setMin(1)
+
+              .setMax(100)
+
+        .setStyle('SHORT'),
+                  )
+                         await client.modal.open(interaction , modal);
+                  
+                    
+                     
+                     
+                     }
     })
 
 
@@ -762,7 +972,7 @@ client.on('modalSubmitInteraction', async interaction => {
       
       let amount = interaction.fields.getTextInputValue("user_amount")
       let a2 = parseInt(amount)
-           if(isNaN(amount)) return interaction.reply({content:"**🙄 - ادخل رقم صحيح .**",ephemeral:true})
+           if(isNaN(amount)) return interaction.reply({content:"**🙄 - ادخل رقم صحيح .**",ephemeral:true})
       if(a2 < 1) return interaction.reply({content:"**🙄 - ادخل رقم صحيح .**",ephemeral:true})
 
       
@@ -926,7 +1136,100 @@ interaction.reply({content: `**تم إبداع مبلغ قدره \`${amount}\`  
                                 } else {
                                 interaction.reply({content:"**⚠️ - كلمة السر خاطئة .**",ephemeral:true})
                                 }
-                      }
+                      } else if(interaction.customId === "bank_modal6"){
+                          let user = interaction.member;
+                            let guild = interaction.guild;                            let memberID = interaction.fields.getTextInputValue("a_id")
+                            let member = guild.members.cache.get(memberID)
+                            if(!member) return interaction.reply({content: "**🙄 - لا يوجد هكذا شخص داخل السيرفر .**",ephemeral:true})
+                            let bank = db.get({key: `bank_SA${memberID}`})
+                          if(!bank) return interaction.reply({content: "**🙄 - هذا الشخص لا يملك حساب بنكي .**",ephemeral:true})
+                            let amount = interaction.fields.getTextInputValue("a_amount")
+                            if(isNaN(amount)) return interaction.reply({content:"**🙄 - ادخل رقم صحيح .**",ephemeral:true})
+                            let money = parseInt(amount)
+                            if(money < 1) return interaction.reply({content:"**🙄 - ادخل رقم صحيح .**",ephemeral:true})
+                            
+                            let password = interaction.fields.getTextInputValue("a_password")
+                            if(password === bankAdminPassword){                            
+                            let cash = parseInt(bank.cash)
+                            let total = cash - money
+                            db.set({
+                                key: `bank_SA${memberID}`,
+                                value: {
+                                   iban:bank.iban,
+                                    cvc:bank.cvc,
+                                    balance:bank.balance,
+                                    cash:total,
+                                    daily:bank.daily
+                         
+                                  }
+                                })
+                                interaction.reply({content:`**تم ازالة مبلغ قدره \`${amount}\`ريال من <@!${memberID}> بنجاح 🏛✅ .**`,ephemeral:true})
+                                } else {
+                                interaction.reply({content:"**⚠️ - كلمة السر خاطئة .**",ephemeral:true})
+                                }
+                          
+                          } else if(interaction.customId === "bank_modal7"){
+                              let user = interaction.member;
+                              let memberID = interaction.fields.getTextInputValue("h_id")
+                              let guild = interaction.guild;
+                            let member = guild.members.cache.get(memberID)
+                          if(!member) return  interaction.reply({content:"**🙄 - لا يوجد هكذا شخص داخل السيرفر .**",ephemeral:true})
+                            let bank = db.get({key:`bank_SA${memberID}`})
+                            if(!bank) return interaction.reply({content:"**🙄 - هذا الشخص لا يملك حساب بنكي .**",ephemeral:true})
+                            let password = interaction.fields.getTextInputValue("h_password")
+                         if(password === bankAdminPassword){
+                          db.set({
+                            key:`bank_SA${memberID}`,
+                            value:{
+                                iban:bank.iban,
+                                cvc:bank.cvc,
+                            balance:0,
+                                cash:0,
+                                daily:bank.daily
+                               }
+                              })
+                             interaction.reply({content:`**تم تصفير <@!${memberID}> بنجاح ✅🏛 .**`,ephemeral:true})
+                               
+                          
+                          } else {
+                              interaction.reply({content:"**⚠️ - كلمة السر خاطئة .**",ephemeral:true})
+                              }
+                          } else if(interaction.customId === "bank_modal8"){
+                              let user = interaction.member;
+                              let guild = interaction.guild;
+                              let memberID = interaction.fields.getTextInputValue("black_id")
+                              let member = guild.members.cache.get(memberID)
+                              if(!member) return interaction.reply({content:"**🙄 - لا يوجد هكذا شخص داخل السيرفر .**",ephemeral:true})
+                            let bank = db.get({key:`bank_SA${memberID}`})
+                            if(!bank) return interaction.reply({content:"**🙄 - هذا الشخص لا يملك حساب بنكي .**",ephemeral:true})
+                            let blacklist = db.get({key:`blacklist_${memberID}`})
+                            if(blacklist) return interaction.reply({content:"**🙄 - هذا الشخص تم اضافته مسبقاً بقائمة البلاك ليست .**",ephemeral:true})
+                            let reason = interaction.fields.getTextInputValue("black_reason")
+                          let duration = interaction.fields.getTextInputValue("black_duration")
+                          if(isNaN(duration)) return interaction.reply({content:"**🙄 - ضع رقم صحيح لعدد الايام .**",ephemeral:true})
+                              
+                              let days = parseInt(duration)
+                              if(days < 1) return interaction.reply({content:"**🙄 - ضع رقم صحيح لعدد الايام .**",ephemeral:true})
+                              
+                              let password = interaction.fields.getTextInputValue("black_password")
+                           if(password === bankAdminPassword){
+                          
+                   db.set({
+                       key: `blacklist_${memberID}`,
+                       value: {
+                           admin:user.id,
+                           res:reason,
+                           time:days
+                           
+                         }
+                       })
+                            interaction.reply({content:`**تم اضافة <@!${memberID}> الى قائمة البلاك ليست لمدة \`${days}\` يوم بنجاح ✅🏛.**`,ephemeral:true})
+                          
+                          } else {
+                              interaction.reply({content:"**⚠️ - كلمة السر خاطئة .**",ephemeral:true})
+                              }
+    } 
+    
     })
     
    
