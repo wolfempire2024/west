@@ -2,6 +2,7 @@ const Discord = require("discord.js")
 const client = new Discord.Client({intents:32767})
 const Database = require("st.db")
 const db = new Database({path:"bank"})
+const probot = require("probot-tax")
 const config = require("./config.json")
 const prefix = config.prefix;
 const token = process.env.token;
