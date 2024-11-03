@@ -50,6 +50,213 @@ console.log(`${client.user.username} Is Ready Now .`)
 
 })
 
+
+client.on('messageCreate', async cozmo => {
+  if (cozmo.content.startsWith(prefix + "open")) {
+    try {
+      if (!cozmo.member.roles.cache.some(r => r.id === config.staff2)) return;
+      let channel = cozmo.guild.channels.cache.get(config.ads);
+      channel.permissionOverwrites.edit(config.media, { 'SEND_MESSAGES': true });
+      cozmo.channel.send(`**تم فتح <#${config.ads}> ✅ .**`);
+    } catch (err) {
+      return;
+    }
+  }
+});
+
+
+client.on('messageCreate', async cozmo => {
+  if (cozmo.content.startsWith(prefix + "close")) {
+    try {
+      if (!cozmo.member.roles.cache.some(r => r.id === config.staff2)) return;
+      let channel = cozmo.guild.channels.cache.get(config.ads);
+      channel.permissionOverwrites.edit(config.media, { 'SEND_MESSAGES': false });
+      cozmo.channel.send(`**تم قفل <#${config.ads}> ✅ .**`);
+    } catch (err) {
+      return;
+    }
+  }
+});
+
+
+
+client.on('messageCreate', async cozmo => {
+  if (cozmo.content.startsWith(prefix + "فتح")) {
+    try {
+      if (!cozmo.member.roles.cache.some(r => r.id === config.staff2)) return;
+      let channel = cozmo.guild.channels.cache.get(config.chat);
+      channel.permissionOverwrites.edit(config.act, { 'SEND_MESSAGES': null });
+      cozmo.channel.send(`**تم فتح <#${config.chat}> ✅ .**`);
+    } catch (err) {
+      return;
+    }
+  }
+});
+client.on('messageCreate', async cozmo => {
+  if (cozmo.content.startsWith(prefix + "قفل")) {
+    try {
+      if (!cozmo.member.roles.cache.some(r => r.id === config.staff2)) return;
+      let channel = cozmo.guild.channels.cache.get(config.chat);
+      channel.permissionOverwrites.edit(config.act, { 'SEND_MESSAGES': false });
+      cozmo.channel.send(`**تم قفل <#${config.chat}> ✅ .**`);
+    } catch (err) {
+      return;
+    }
+  }
+});
+client.on('messageCreate', async cozmo => {
+  if (cozmo.content.startsWith(prefix + "قيم")) {
+    try {
+      if (!cozmo.member.roles.cache.some(r => r.id === config.staff2)) return;
+      let channel = cozmo.guild.channels.cache.get(config.chat);
+      var q1, q2;
+      let filter1 = (m => m.author.id === cozmo.author.id);
+
+      await cozmo.channel.send("**وقت القيم :**").then(coz => { 
+        coz.channel.awaitMessages({ filter: filter1, max: 1, time: 180000, errors: ['time'] })
+          .then(collected => {
+            collected.first().delete();
+            q1 = collected.first().content; 
+
+            coz.edit("**ايديك سوني :**").then(coz => { 
+              coz.channel.awaitMessages({ filter: filter1, max: 1, time: 180000, errors: ['time'] })
+                .then(collected => { 
+                  collected.first().delete();
+                  q2 = collected.first().content; 
+                  coz.edit(`**سيتم فتح القيم الآن في <#${channel.id}>**`);
+                  channel.permissionOverwrites.edit(config.act, { 'SEND_MESSAGES': false });
+                  channel.send(`**للحياة الواقعية | CIA SERVER
+اعزائنا اعضاء مدينة CIA SERVER نود ابلاغكم بأن ، طائرة المدينة علي وشك الاقلاع . 
+الرجاء من الاعضاء الكرام اضافة ،
+قائد الرحلة : ${q2}
+علما بأن الوقت المحدد للاقلاع ، 
+الساعه :  ${q1} 
+وانتضار قائد الرحلة لارسال الدعوة 
+@everyone **`); 
+                });
+            });
+          });
+      });
+    } catch (err) {
+      return;
+    }
+  }
+});
+client.on('messageCreate', async cozmo => {
+  if (cozmo.content.startsWith(prefix + "عضويات")) {
+    try {
+      if (!cozmo.member.roles.cache.some(r => r.id === config.staff2)) return;
+      let chan = cozmo.guild.channels.cache.get(config.chat2);
+      var q1, q2;
+      let filter1 = (m => m.author.id === cozmo.author.id);
+
+      await cozmo.channel.send("**وقت القيم :**").then(coz => { 
+        coz.channel.awaitMessages({ filter: filter1, max: 1, time: 180000, errors: ['time'] })
+          .then(collected => {
+            collected.first().delete();
+            q1 = collected.first().content; 
+
+            coz.edit("**ايديك سوني :**").then(coz => { 
+              coz.channel.awaitMessages({ filter: filter1, max: 1, time: 180000, errors: ['time'] })
+                .then(collected => { 
+                  collected.first().delete();
+                  q2 = collected.first().content; 
+                  coz.edit(`**سيتم فتح القيم الآن في <#${chan.id}>**`);
+                  chan.send(`__**أعزائي أصحاب العضويات المذكورة بالأسفل 
+نود بابلاغكم بـ :
+ أنه تم فتح الرحلة و يمكن لجميع أصحاب العضويات الدخول الأن ؛
+على أدمن القيم : ${q2}
+و توقيت الرحلة هو : ${q1}
+- يرجى التأكد من إضافة الأدمن .
+@everyone **__`);
+                });
+            });
+          });
+      });
+    } catch (err) {
+      return;
+    }
+  }
+});
+
+
+client.on("messageCreate", async (cozmo) => {
+  if (cozmo.content.startsWith(prefix + "نداء")) {
+    if (!cozmo.member.roles.cache.has(config.staff)) return;
+    let user = cozmo.mentions.users.first();
+    if (!user) return cozmo.channel.send("**منشن الشخص ❌ .**");
+
+    const embed = new MessageEmbed()
+      .setColor("RANDOM")
+      .setDescription(`**<a:828419855778316308:976042712606339132> - الاداري ( <@!${cozmo.author.id}> ) يناديك .
+تكتك للحين مفتوح وعليك انك تراجعه ؛ 
+<:emoji_87:960215491337678918> - تكتك (  <#${cozmo.channel.id}> )**`)
+      .setFooter(user.username, user.displayAvatarURL({ dynamic: true }));
+
+    cozmo.channel.send(`**تم نداء <@!${user.id}> ✅ .**`);
+    user.send({ embeds: [embed] });
+  }
+});
+client.on("messageCreate", async (cozmo) => {
+  if (cozmo.content.startsWith(prefix + "خصم")) {
+    try {
+      let args1 = cozmo.content.split(' ')[1];
+      let args2 = cozmo.content.split(' ')[2];
+      if (!args1) return cozmo.channel.send(`**اكـتـب الـمـبـلـغ**`);
+      if (isNaN(args1) || isNaN(args2)) return cozmo.channel.send(`**هـذا لـيـس رقـمـا**`);
+      if (args2 > 100) return cozmo.channel.send("**لا يـوجـد خـصـم اكـثـر مـن 100**");
+
+      let num1 = parseInt(args1);
+      let num2 = parseInt(args2);
+      let discount = num1 - Math.floor(num1 * num2 / 100);
+      let tax = probot.taxs(discount);
+
+      const embed = new MessageEmbed()
+        .setTitle("**الخصم**")
+        .setColor("RED")
+        .setDescription(`**💳 - المبلغ : \`${args1}\`
+🔑 - الخصم : \`${args2}\`
+<a:emoji_99:960216112707022909> - المبلغ بعد الخصم : \`${discount}\`
+<a:emoji_71:948283318879780916> - المبلغ بعد الخصم مع الضريبة : \`${tax}\`**`)
+        .setImage("https://media.discordapp.net/attachments/996363642335412236/998280648416567448/3f23f7353e265268.png")
+        .setFooter(cozmo.author.username, cozmo.author.displayAvatarURL());
+
+      cozmo.channel.send({ embeds: [embed] });
+    } catch (err) {
+      return;
+    }
+  }
+});
+client.on("messageCreate", async (wolf) => {
+  if (wolf.content.startsWith(prefix + 'ضريبة')) {
+    try {
+      let args = wolf.content.split(' ')[1];
+      if (!args) return wolf.channel.send(`**اكـتـب الـمـبـلـغ**`);
+      if (isNaN(args)) return wolf.channel.send(`**هـذا لـيـس رقـمـا**`);
+
+      let tax = probot.taxs(args);
+      let num = parseInt(args);
+      if (!num) return;
+      
+      let tax4 = Math.floor(num * (20) / (19) + (1) - (num));  // تعديل الحسابات إذا لزم الأمر
+      const embed = new MessageEmbed()
+        .setTitle("**الـضـريـبـة**")
+        .setColor("RED")
+        .setDescription(`**💵 - المبلغ : \`${args}\`
+💳 - المبلغ مع الضريبة : \`${tax}\`
+<a:emoji_95:960215729997754368> - المبلغ مع ضريبة الوسيط : \`${tax4}\`**`)
+        .setImage("https://media.discordapp.net/attachments/996363642335412236/998280648416567448/3f23f7353e265268.png")
+        .setFooter(wolf.author.username, wolf.author.displayAvatarURL());
+
+      wolf.channel.send({ embeds: [embed] });
+    } catch (err) {
+      return;
+    }
+  }
+});
+
+
+
 client.on("messageCreate",async wolf => {
     if(wolf.content.startsWith(prefix + "setActiveChannel") || wolf.content.startsWith(prefix + "sac")){
     if(!wolf.member.permissions.has("ADMINISTRATOR")) return;
